@@ -1,0 +1,374 @@
+{
+  "info": {
+    "name": "Email to OneDrive Automation API",
+    "description": "Complete API collection for the Email to OneDrive Automation system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Get Sign-In URL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signin?userId={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signin"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Check Auth Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/status/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "status", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Sign Out",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signout/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signout", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Emails",
+      "item": [
+        {
+          "name": "List Emails",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emails/{{userId}}?folder=inbox&top=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emails", "{{userId}}"],
+              "query": [
+                {
+                  "key": "folder",
+                  "value": "inbox"
+                },
+                {
+                  "key": "top",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Email Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emails/{{userId}}/{{messageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emails", "{{userId}}", "{{messageId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Email Attachments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emails/{{userId}}/{{messageId}}/attachments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emails", "{{userId}}", "{{messageId}}", "attachments"]
+            }
+          }
+        },
+        {
+          "name": "List Emails with Attachments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emails/{{userId}}?folder=inbox&filter=hasAttachments eq true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emails", "{{userId}}"],
+              "query": [
+                {
+                  "key": "folder",
+                  "value": "inbox"
+                },
+                {
+                  "key": "filter",
+                  "value": "hasAttachments eq true"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "OneDrive",
+      "item": [
+        {
+          "name": "List Folders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/onedrive/{{userId}}/folders?path=/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "onedrive", "{{userId}}", "folders"],
+              "query": [
+                {
+                  "key": "path",
+                  "value": "/"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Folder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"folderName\": \"EmailAttachments\",\n  \"parentPath\": \"/\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/onedrive/{{userId}}/folders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "onedrive", "{{userId}}", "folders"]
+            }
+          }
+        },
+        {
+          "name": "Upload File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"test.txt\",\n  \"fileContent\": \"SGVsbG8gV29ybGQh\",\n  \"folderPath\": \"/EmailAttachments\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/onedrive/{{userId}}/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "onedrive", "{{userId}}", "upload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Automation Rules",
+      "item": [
+        {
+          "name": "List Rules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Rule Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}/{{ruleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}", "{{ruleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Rule - Invoice Attachments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Save Invoice Attachments\",\n  \"sourceFolder\": \"inbox\",\n  \"targetFolder\": \"/Invoices/{year}/{month}\",\n  \"filters\": {\n    \"subject\": \"invoice\",\n    \"hasAttachments\": true,\n    \"attachmentExtensions\": [\"pdf\", \"xlsx\"]\n  },\n  \"schedule\": \"manual\",\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Rule - All PDF Attachments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Save All PDFs\",\n  \"sourceFolder\": \"inbox\",\n  \"targetFolder\": \"/PDFs/{sender}\",\n  \"filters\": {\n    \"hasAttachments\": true,\n    \"attachmentExtensions\": [\"pdf\"]\n  },\n  \"schedule\": {\n    \"type\": \"interval\",\n    \"intervalMinutes\": 30\n  },\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Rule",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Rule Name\",\n  \"enabled\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}/{{ruleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}", "{{ruleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Execute Rule",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}/{{ruleId}}/execute",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}", "{{ruleId}}", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Delete Rule",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}/{{ruleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}", "{{ruleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Process Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/{{userId}}/logs?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "{{userId}}", "logs"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "API Information",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": [""]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "testuser123",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
