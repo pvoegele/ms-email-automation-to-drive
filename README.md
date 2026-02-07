@@ -19,7 +19,7 @@ Before you begin, ensure you have:
 
 - Node.js 16+ installed
 - Microsoft Azure account with an Azure AD app registration
-- Firebase project with Firestore enabled
+- Firebase project with Firestore enabled (see [why Firestore?](./DATABASE_CHOICE.md))
 - Git
 
 ## 🛠️ Installation
@@ -370,6 +370,14 @@ processLogs/{logId}
 ## 📝 License
 
 ISC
+
+## 📖 Additional Documentation
+
+- [Setup Guide](./SETUP.md) - Detailed Azure AD and Firebase setup
+- [API Documentation](./API_DOCS.md) - Complete API reference
+- [Quick Start](./QUICKSTART.md) - Get started quickly
+- [Automation Examples](./examples/AUTOMATION_RULES.md) - Real-world rule examples
+- **[Database Choice](./DATABASE_CHOICE.md)** - Why we recommend Cloud Firestore
 
 ## 👥 Contributing
 
