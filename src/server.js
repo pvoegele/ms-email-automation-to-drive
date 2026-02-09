@@ -163,9 +163,11 @@ app.get('/', (req, res) => {
 }
 
 // Start the server
-startServer().catch(error => {
+const appInstance = await startServer().catch(error => {
   console.error('Failed to start server:', error);
   process.exit(1);
 });
 
-export default startServer;
+// Export both for backward compatibility
+export default appInstance;
+export { startServer };

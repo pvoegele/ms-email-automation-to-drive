@@ -8,9 +8,23 @@ import { authLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-// Temporary in-memory store for PKCE verifiers
-// In production, use Redis or similar
+// PKCE verifier storage
+// WARNING: In-memory storage will not work in multi-instance deployments
+// Production should use Redis or similar distributed cache
+// Example: const pkceStore = new Redis({ host: 'redis-host', port: 6379 });
 const pkceStore = new Map();
+
+// In production, implement with Redis:
+// async function setPKCEData(state, data) {
+//   await redis.set(`pkce:${state}`, JSON.stringify(data), 'EX', 600);
+// }
+// async function getPKCEData(state) {
+//   const data = await redis.get(`pkce:${state}`);
+//   return data ? JSON.parse(data) : null;
+// }
+// async function deletePKCEData(state) {
+//   await redis.del(`pkce:${state}`);
+// }
 
 /**
  * GET /connect/microsoft/start

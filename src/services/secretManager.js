@@ -8,8 +8,17 @@ import crypto from 'crypto';
  * Production: Should integrate with Google Secret Manager or similar
  */
 
-// In production, this should be stored in environment variable or loaded from Secret Manager
-const ENCRYPTION_KEY = process.env.TOKEN_ENCRYPTION_KEY || crypto.randomBytes(32);
+// Encryption key must be set in environment variables
+// This is critical for production as keys are needed to decrypt stored tokens
+if (!process.env.TOKEN_ENCRYPTION_KEY) {
+  throw new Error('TOKEN_ENCRYPTION_KEY environment variable must be set for token encryption');
+}
+
+const ENCRYPTION_KEY = Buffer.from(process.env.TOKEN_ENCRYPTION_KEY, 'hex');
+if (ENCRYPTION_KEY.length !== 32) {
+  throw new Error('TOKEN_ENCRYPTION_KEY must be a 32-byte (64 hex characters) key');
+}
+
 const ALGORITHM = 'aes-256-gcm';
 
 /**
@@ -147,12 +156,11 @@ export async function deleteTokenSecurely(tokenRef) {
  */
 export async function initializeSecretManager() {
   try {
-    // For MVP, check if encryption key is available
+    // For MVP, verify encryption key is properly set
     if (!process.env.TOKEN_ENCRYPTION_KEY) {
-      console.warn('TOKEN_ENCRYPTION_KEY not set. Using temporary key (not suitable for production).');
-    } else {
-      console.log('Secret Manager initialized with encryption key');
+      throw new Error('TOKEN_ENCRYPTION_KEY not set');
     }
+    console.log('Secret Manager initialized with encryption key');
   } catch (error) {
     console.error('Error initializing Secret Manager:', error);
     throw error;

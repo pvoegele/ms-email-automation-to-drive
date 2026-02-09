@@ -12,9 +12,23 @@ import { uploadAttachmentToSharePoint } from './sharePointService.js';
 /**
  * Mailbox Polling Service
  * Polls mailboxes for new emails with attachments and processes them
+ * 
+ * NOTE: Uses module-level singleton for simplicity in MVP
+ * For production with multiple instances or testing, consider:
+ * - Using a PollingManager class
+ * - External job scheduler (e.g., Cloud Scheduler, cron)
+ * - Distributed locking (e.g., Redis) for coordination
  */
 
 let pollingInterval = null;
+
+/**
+ * Check if polling is currently running
+ * @returns {boolean} True if polling is active
+ */
+export function isPollingActive() {
+  return pollingInterval !== null;
+}
 
 /**
  * Start mailbox polling
@@ -134,8 +148,11 @@ export async function pollMailbox(mailbox) {
     let filter = 'hasAttachments eq true';
     
     // Add cursor filter if exists
+    // OData datetime filter requires ISO format wrapped in single quotes
     if (lastCursor) {
-      filter += ` and receivedDateTime gt ${lastCursor}`;
+      // Ensure lastCursor is in ISO format
+      const cursorDate = new Date(lastCursor).toISOString();
+      filter += ` and receivedDateTime gt '${cursorDate}'`;
     }
 
     // Fetch messages
