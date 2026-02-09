@@ -6,8 +6,31 @@ import { authLimiter } from '../middleware/rateLimiter.js';
 const router = express.Router();
 
 /**
- * GET /api/auth/signin
- * Get Microsoft authentication URL
+ * @swagger
+ * /api/auth/signin:
+ *   get:
+ *     summary: Get Microsoft authentication URL
+ *     tags: [Authentication]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     responses:
+ *       200:
+ *         description: Authentication URL generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthUrl'
+ *       400:
+ *         description: Missing userId parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get('/signin', authLimiter, async (req, res, next) => {
   try {
@@ -29,8 +52,41 @@ router.get('/signin', authLimiter, async (req, res, next) => {
 });
 
 /**
- * GET /api/auth/callback
- * Handle OAuth callback from Microsoft
+ * @swagger
+ * /api/auth/callback:
+ *   get:
+ *     summary: Handle OAuth callback from Microsoft
+ *     tags: [Authentication]
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         schema:
+ *           type: string
+ *         description: Authorization code from Microsoft
+ *       - in: query
+ *         name: state
+ *         schema:
+ *           type: string
+ *         description: State parameter containing userId
+ *       - in: query
+ *         name: error
+ *         schema:
+ *           type: string
+ *         description: Error code from OAuth provider
+ *       - in: query
+ *         name: error_description
+ *         schema:
+ *           type: string
+ *         description: Error description from OAuth provider
+ *     responses:
+ *       302:
+ *         description: Redirects to frontend with success or error status
+ *       400:
+ *         description: Missing code or state parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get('/callback', authLimiter, async (req, res, next) => {
   try {
@@ -69,8 +125,25 @@ router.get('/callback', authLimiter, async (req, res, next) => {
 });
 
 /**
- * GET /api/auth/status/:userId
- * Check authentication status for a user
+ * @swagger
+ * /api/auth/status/{userId}:
+ *   get:
+ *     summary: Check authentication status for a user
+ *     tags: [Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     responses:
+ *       200:
+ *         description: Authentication status retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthStatus'
  */
 router.get('/status/:userId', authLimiter, async (req, res, next) => {
   try {
@@ -102,8 +175,25 @@ router.get('/status/:userId', authLimiter, async (req, res, next) => {
 });
 
 /**
- * POST /api/auth/signout/:userId
- * Sign out user and remove tokens
+ * @swagger
+ * /api/auth/signout/{userId}:
+ *   post:
+ *     summary: Sign out user and remove tokens
+ *     tags: [Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     responses:
+ *       200:
+ *         description: User signed out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
  */
 router.post('/signout/:userId', authLimiter, async (req, res, next) => {
   try {

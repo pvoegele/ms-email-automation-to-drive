@@ -7,6 +7,26 @@ dotenv.config();
  * Microsoft Authentication Library (MSAL) Configuration
  * Supports multi-tenant authentication
  */
+
+// Validate required environment variables
+function validateMsalConfig() {
+  const missing = [];
+  if (!process.env.CLIENT_ID) missing.push('CLIENT_ID');
+  if (!process.env.CLIENT_SECRET) missing.push('CLIENT_SECRET');
+  if (!process.env.REDIRECT_URI) missing.push('REDIRECT_URI');
+  
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required Azure AD environment variables: ${missing.join(', ')}\n` +
+      `Please create a .env file with the required credentials.\n` +
+      `See SETUP.md or README.md for configuration instructions.`
+    );
+  }
+}
+
+// Validate configuration before creating client
+validateMsalConfig();
+
 const msalConfig = {
   auth: {
     clientId: process.env.CLIENT_ID,

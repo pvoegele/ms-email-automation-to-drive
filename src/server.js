@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -17,6 +18,9 @@ import rulesRoutes from './routes/rules.js';
 // Import services
 import { initializeFirebase } from './services/firebase.js';
 import { logger } from './utils/logger.js';
+
+// Import Swagger configuration
+import { swaggerSpec } from './config/swagger.js';
 
 // Load environment variables
 dotenv.config();
@@ -49,6 +53,39 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' })); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Parse URL-encoded bodies
 
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Email to OneDrive Automation API Documentation',
+}));
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: healthy
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 uptime:
+ *                   type: number
+ *                   description: Server uptime in seconds
+ *                 environment:
+ *                   type: string
+ *                   example: development
+ */
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -68,11 +105,46 @@ app.use('/api/rules', rulesRoutes);
 // Apply rate limiting to all API routes
 app.use('/api', apiLimiter);
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: API information and endpoint list
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: API information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 version:
+ *                   type: string
+ *                 documentation:
+ *                   type: object
+ *                   properties:
+ *                     swagger:
+ *                       type: string
+ *                       description: Swagger UI documentation URL
+ *                     health:
+ *                       type: string
+ *                       description: Health check endpoint URL
+ *                 endpoints:
+ *                   type: object
+ *                   description: Available API endpoints
+ */
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
     message: 'Email to OneDrive Automation API',
     version: '1.0.0',
+    documentation: {
+      swagger: '/api-docs',
+      health: '/health',
+    },
     endpoints: {
       health: '/health',
       auth: {
@@ -117,6 +189,7 @@ app.listen(PORT, () => {
   logger.info(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
   console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/`);
+  console.log(`📖 Swagger UI: http://localhost:${PORT}/api-docs`);
   console.log(`💚 Health Check: http://localhost:${PORT}/health\n`);
 });
 

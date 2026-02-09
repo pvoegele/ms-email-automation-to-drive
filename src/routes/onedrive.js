@@ -10,8 +10,46 @@ import { apiLimiter, uploadLimiter } from '../middleware/rateLimiter.js';
 const router = express.Router();
 
 /**
- * GET /api/onedrive/:userId/folders
- * List OneDrive folders
+ * @swagger
+ * /api/onedrive/{userId}/folders:
+ *   get:
+ *     summary: List OneDrive folders
+ *     tags: [OneDrive]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: query
+ *         name: path
+ *         schema:
+ *           type: string
+ *           default: /
+ *         description: Folder path to list
+ *     responses:
+ *       200:
+ *         description: Folders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 path:
+ *                   type: string
+ *                 count:
+ *                   type: number
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/OneDriveItem'
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
  */
 router.get('/:userId/folders', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -32,8 +70,52 @@ router.get('/:userId/folders', apiLimiter, authenticateUser, async (req, res, ne
 });
 
 /**
- * POST /api/onedrive/:userId/folders
- * Create OneDrive folder
+ * @swagger
+ * /api/onedrive/{userId}/folders:
+ *   post:
+ *     summary: Create OneDrive folder
+ *     tags: [OneDrive]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - folderName
+ *             properties:
+ *               folderName:
+ *                 type: string
+ *                 description: Name of the folder to create
+ *               parentPath:
+ *                 type: string
+ *                 default: /
+ *                 description: Parent folder path
+ *     responses:
+ *       200:
+ *         description: Folder created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 folder:
+ *                   $ref: '#/components/schemas/OneDriveItem'
+ *       400:
+ *         description: Missing required fields
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
  */
 router.post('/:userId/folders', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -56,8 +138,57 @@ router.post('/:userId/folders', apiLimiter, authenticateUser, async (req, res, n
 });
 
 /**
- * POST /api/onedrive/:userId/upload
- * Upload file to OneDrive
+ * @swagger
+ * /api/onedrive/{userId}/upload:
+ *   post:
+ *     summary: Upload file to OneDrive
+ *     tags: [OneDrive]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fileName
+ *               - fileContent
+ *             properties:
+ *               fileName:
+ *                 type: string
+ *                 description: Name of the file to upload
+ *               fileContent:
+ *                 type: string
+ *                 format: base64
+ *                 description: File content as base64 string
+ *               folderPath:
+ *                 type: string
+ *                 default: /
+ *                 description: Target folder path
+ *     responses:
+ *       200:
+ *         description: File uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 file:
+ *                   $ref: '#/components/schemas/OneDriveItem'
+ *       400:
+ *         description: Missing required fields
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
  */
 router.post('/:userId/upload', uploadLimiter, authenticateUser, async (req, res, next) => {
   try {

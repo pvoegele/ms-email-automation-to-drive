@@ -14,8 +14,38 @@ import { apiLimiter } from '../middleware/rateLimiter.js';
 const router = express.Router();
 
 /**
- * GET /api/rules/:userId
- * Get all automation rules for user
+ * @swagger
+ * /api/rules/{userId}:
+ *   get:
+ *     summary: Get all automation rules for user
+ *     tags: [Rules]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     responses:
+ *       200:
+ *         description: Rules retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: number
+ *                 rules:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/AutomationRule'
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
  */
 router.get('/:userId', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -34,8 +64,42 @@ router.get('/:userId', apiLimiter, authenticateUser, async (req, res, next) => {
 });
 
 /**
- * GET /api/rules/:userId/:ruleId
- * Get single automation rule
+ * @swagger
+ * /api/rules/{userId}/{ruleId}:
+ *   get:
+ *     summary: Get single automation rule
+ *     tags: [Rules]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: path
+ *         name: ruleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Rule ID
+ *     responses:
+ *       200:
+ *         description: Rule retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 rule:
+ *                   $ref: '#/components/schemas/AutomationRule'
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
+ *       404:
+ *         description: Rule not found
  */
 router.get('/:userId/:ruleId', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -57,8 +121,60 @@ router.get('/:userId/:ruleId', apiLimiter, authenticateUser, async (req, res, ne
 });
 
 /**
- * POST /api/rules/:userId
- * Create new automation rule
+ * @swagger
+ * /api/rules/{userId}:
+ *   post:
+ *     summary: Create new automation rule
+ *     tags: [Rules]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - targetFolder
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Rule name
+ *               targetFolder:
+ *                 type: string
+ *                 description: Target OneDrive folder path
+ *               enabled:
+ *                 type: boolean
+ *                 default: true
+ *               filters:
+ *                 type: object
+ *                 description: Email filter criteria
+ *     responses:
+ *       201:
+ *         description: Rule created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 ruleId:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Missing required fields
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
  */
 router.post('/:userId', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -87,8 +203,54 @@ router.post('/:userId', apiLimiter, authenticateUser, async (req, res, next) => 
 });
 
 /**
- * PUT /api/rules/:userId/:ruleId
- * Update automation rule
+ * @swagger
+ * /api/rules/{userId}/{ruleId}:
+ *   put:
+ *     summary: Update automation rule
+ *     tags: [Rules]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: path
+ *         name: ruleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Rule ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               targetFolder:
+ *                 type: string
+ *               enabled:
+ *                 type: boolean
+ *               filters:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Rule updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Rule not found
  */
 router.put('/:userId/:ruleId', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -118,8 +280,39 @@ router.put('/:userId/:ruleId', apiLimiter, authenticateUser, async (req, res, ne
 });
 
 /**
- * DELETE /api/rules/:userId/:ruleId
- * Delete automation rule
+ * @swagger
+ * /api/rules/{userId}/{ruleId}:
+ *   delete:
+ *     summary: Delete automation rule
+ *     tags: [Rules]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: path
+ *         name: ruleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Rule ID
+ *     responses:
+ *       200:
+ *         description: Rule deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Rule not found
  */
 router.delete('/:userId/:ruleId', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -148,8 +341,45 @@ router.delete('/:userId/:ruleId', apiLimiter, authenticateUser, async (req, res,
 });
 
 /**
- * POST /api/rules/:userId/:ruleId/execute
- * Execute automation rule manually
+ * @swagger
+ * /api/rules/{userId}/{ruleId}/execute:
+ *   post:
+ *     summary: Execute automation rule manually
+ *     tags: [Rules]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: path
+ *         name: ruleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Rule ID
+ *     responses:
+ *       200:
+ *         description: Rule executed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 result:
+ *                   type: object
+ *                   description: Execution result with processed emails count
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Rule not found
  */
 router.post('/:userId/:ruleId/execute', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
@@ -179,8 +409,44 @@ router.post('/:userId/:ruleId/execute', apiLimiter, authenticateUser, async (req
 });
 
 /**
- * GET /api/rules/:userId/logs
- * Get process logs for user
+ * @swagger
+ * /api/rules/{userId}/logs:
+ *   get:
+ *     summary: Get process logs for user
+ *     tags: [Rules]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Maximum number of logs to retrieve
+ *     responses:
+ *       200:
+ *         description: Logs retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: number
+ *                 logs:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication
  */
 router.get('/:userId/logs', apiLimiter, authenticateUser, async (req, res, next) => {
   try {
