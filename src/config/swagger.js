@@ -1,4 +1,10 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = join(__dirname, '..', '..');
 
 const options = {
   definition: {
@@ -9,6 +15,9 @@ const options = {
       description: 'A powerful Node.js/Express backend API for automating email processing and attachment management with Microsoft Graph API and OneDrive integration.',
       contact: {
         name: 'API Support',
+      },
+      license: {
+        name: 'ISC',
       },
     },
     servers: [
@@ -159,8 +168,48 @@ const options = {
       },
     ],
   },
-  apis: ['./src/routes/*.js', './src/server.js'], // Paths to files containing OpenAPI definitions
+  apis: [
+    join(rootDir, 'src', 'routes', '*.js'),
+    join(rootDir, 'src', 'server.js'),
+  ], // Paths to files containing OpenAPI definitions
 };
 
-export const swaggerSpec = swaggerJsdoc(options);
+let swaggerSpec;
+try {
+  swaggerSpec = swaggerJsdoc(options);
+  // Validate that we have paths
+  if (!swaggerSpec.paths || Object.keys(swaggerSpec.paths).length === 0) {
+    console.warn('⚠️  Swagger spec generated but no paths found. Check file paths in apis array.');
+    console.warn('Looking for files in:', options.apis);
+  } else {
+    console.log(`✅ Swagger spec generated with ${Object.keys(swaggerSpec.paths).length} paths`);
+  }
+} catch (error) {
+  console.error('❌ Error generating Swagger spec:', error);
+  throw error;
+}
+
+export { swaggerSpec };
+
+// Swagger UI options for better presentation
+export const swaggerUiOptions = {
+  customCss: `
+    .swagger-ui .topbar { display: none }
+    .swagger-ui .info { margin: 20px 0; }
+    .swagger-ui .info .title { color: #3b82f6; }
+    .swagger-ui .scheme-container { background: #f9fafb; padding: 15px; border-radius: 4px; margin: 20px 0; }
+  `,
+  customSiteTitle: 'Email to OneDrive Automation API',
+  customfavIcon: '/favicon.ico',
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    showExtensions: true,
+    showCommonExtensions: true,
+    docExpansion: 'list', // 'none', 'list', or 'full'
+    defaultModelsExpandDepth: 1,
+    defaultModelExpandDepth: 1,
+  },
+};
 

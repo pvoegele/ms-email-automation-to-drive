@@ -20,7 +20,7 @@ import { initializeFirebase } from './services/firebase.js';
 import { logger } from './utils/logger.js';
 
 // Import Swagger configuration
-import { swaggerSpec } from './config/swagger.js';
+import { swaggerSpec, swaggerUiOptions } from './config/swagger.js';
 
 // Load environment variables
 dotenv.config();
@@ -53,11 +53,15 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' })); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Parse URL-encoded bodies
 
-// Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Email to OneDrive Automation API Documentation',
-}));
+// Swagger JSON endpoint
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+// Swagger UI - setup with proper middleware chain
+const swaggerUiHandler = swaggerUi.setup(swaggerSpec, swaggerUiOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUiHandler);
 
 /**
  * @swagger
@@ -143,6 +147,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     documentation: {
       swagger: '/api-docs',
+      swaggerJson: '/api-docs.json',
       health: '/health',
     },
     endpoints: {
